@@ -1,5 +1,5 @@
-import '../../domain/entities/contact.dart';
-import '../../domain/repositories/contact_repository.dart';
+import 'package:contact/domain/entities/contact.dart';
+import 'package:contact/domain/repositories/contact_repository.dart';
 
 class AddContact {
   final ContactRepository repository;
@@ -25,5 +25,14 @@ class DeleteContact {
 
   Future<void> call(int seq) async {
     await repository.deleteContact(seq);
+  }
+}
+
+class SearchContacts {
+  final ContactRepository repository;
+  SearchContacts(this.repository);
+
+  Future<List<Contact>> call(String keyword) async {
+    return await repository.searchContacts(keyword);
   }
 }

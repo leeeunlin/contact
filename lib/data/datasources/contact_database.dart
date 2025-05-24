@@ -32,7 +32,8 @@ class ContactDatabase {
         seq INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
         number TEXT,
-        email TEXT
+        email TEXT,
+        initial TEXT
       )
     ''');
   }
@@ -42,8 +43,9 @@ class ContactDatabase {
     for (int i = 0; i < 200; i++) {
       await db.insert('contacts', {
         'name': '이름 $i',
-        'number': '번호 $i',
-        'email': '이메일 $i',
+        'number': '01000$i',
+        'email': 'mail$i@mailll.com',
+        'initial': getInitial('이름 $i'),
       });
     }
   }
@@ -59,11 +61,13 @@ class ContactDatabase {
   Future<void> insertContact(Map<String, dynamic> contact) async {
     final db = await instance.database;
     contact.remove('seq'); // seq는 자동 증가이므로 제거
+    contact['initial'] = getInitial(contact['name'] ?? '');
     await db.insert('contacts', contact);
   }
 
   Future<void> updateContact(Map<String, dynamic> contact) async {
     final db = await instance.database;
+    contact['initial'] = getInitial(contact['name'] ?? '');
     await db.update(
       'contacts',
       contact,
@@ -92,5 +96,50 @@ class ContactDatabase {
     return aaa.take(20).toList();
   }
 
-  // 추가적인 CRUD 메서드는 필요에 따라 구현
+  // 초성 추출 함수
+  String getInitial(String text) {
+    const initials = [
+      'ㄱ',
+      'ㄲ',
+      'ㄴ',
+      'ㄷ',
+      'ㄸ',
+      'ㄹ',
+      'ㅁ',
+      'ㅂ',
+      'ㅃ',
+      'ㅅ',
+      'ㅆ',
+      'ㅇ',
+      'ㅈ',
+      'ㅉ',
+      'ㅊ',
+      'ㅋ',
+      'ㅌ',
+      'ㅍ',
+      'ㅎ',
+    ];
+    String result = '';
+    for (int i = 0; i < text.length; i++) {
+      int code = text.codeUnitAt(i) - 0xAC00;
+      if (code >= 0 && code <= 11171) {
+        result += initials[(code ~/ 588)];
+      } else {
+        result += text[i];
+      }
+    }
+    return result;
+  }
+
+  Future<List<Map<String, dynamic>>> searchContacts(String keyword) async {
+    final db = await instance.database;
+    final initialKeyword = getInitial(keyword);
+    final result = await db.query(
+      'contacts',
+      where: 'initial LIKE ? OR name LIKE ? OR number LIKE ?',
+      whereArgs: ['%$initialKeyword%', '%$keyword%', '%$keyword%'],
+      orderBy: 'name ASC',
+    );
+    return result;
+  }
 }

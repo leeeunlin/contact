@@ -65,3 +65,10 @@ final contactNotifierProvider =
         ref.read(deleteContactProvider),
       ),
     );
+
+final searchContactsProvider = Provider(
+  (ref) => SearchContacts(ref.read(contactRepositoryProvider)),
+);
+
+final searchResultProvider = StateProvider<List<Contact>>((ref) => []);
+final searchTextProvider = StateProvider<String>((ref) => '');

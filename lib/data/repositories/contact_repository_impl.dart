@@ -23,4 +23,10 @@ class ContactRepositoryImpl implements ContactRepository {
     final maps = await ContactDatabase.instance.getContacts();
     return maps.map((e) => Contact.fromJson(e)).toList();
   }
+
+  @override
+  Future<List<Contact>> searchContacts(String keyword) async {
+    final result = await ContactDatabase.instance.searchContacts(keyword);
+    return result.map((e) => Contact.fromJson(e)).toList();
+  }
 }

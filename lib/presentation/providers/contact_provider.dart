@@ -31,16 +31,19 @@ class ContactNotifier extends StateNotifier<List<Contact>> {
 
   Future<void> addContact(Contact contact) async {
     await addContactUseCase(contact);
+    page = 1;
     await fetchContacts(); // 저장 후 전체 리스트 갱신
   }
 
   Future<void> updateContact(Contact contact) async {
     await updateContactUseCase(contact);
+    page = 1;
     await fetchContacts(); // 수정 후 전체 리스트 갱신
   }
 
   Future<void> deleteContact(int seq) async {
     await deleteContactUseCase(seq);
+    page = 1;
     await fetchContacts(); // 삭제 후 리스트 갱신
   }
 
